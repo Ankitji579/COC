@@ -22,7 +22,7 @@ export class GameScene extends Phaser.Scene {
     
     private nextSpawnTime = 0;
     private enemiesToSpawn = 0;
-    private currentWaveType: 'RAIDER' | 'TANK' | 'SWARM' = 'RAIDER';
+    private currentWaveType: 'RAIDER' | 'TANK' | 'SWARM' | 'BOSS' = 'RAIDER';
 
     constructor() {
         super('GameScene');
@@ -32,110 +32,139 @@ export class GameScene extends Phaser.Scene {
         const g = this.add.graphics();
         
         // --- CORE ---
-        // A high-tech structure with a glowing center
-        g.lineStyle(2, 0x00ffff, 1);
-        g.fillStyle(0x112233, 1);
-        g.fillRoundedRect(4, 4, TILE_SIZE*3 - 8, TILE_SIZE*3 - 8, 16);
-        g.strokeRoundedRect(4, 4, TILE_SIZE*3 - 8, TILE_SIZE*3 - 8, 16);
-        g.fillStyle(0x00aaff, 1);
-        g.fillCircle(TILE_SIZE*1.5, TILE_SIZE*1.5, TILE_SIZE*0.8);
-        g.fillStyle(0xffffff, 1);
+        g.fillStyle(0x0f172a, 1);
+        g.fillRoundedRect(0, 0, TILE_SIZE*3, TILE_SIZE*3, 16);
+        g.lineStyle(4, 0x0ea5e9, 1);
+        g.strokeRoundedRect(2, 2, TILE_SIZE*3 - 4, TILE_SIZE*3 - 4, 16);
+        g.fillStyle(0x38bdf8, 0.2);
+        g.fillCircle(TILE_SIZE*1.5, TILE_SIZE*1.5, TILE_SIZE*1.2);
+        g.fillStyle(0x0284c7, 1);
+        g.fillCircle(TILE_SIZE*1.5, TILE_SIZE*1.5, TILE_SIZE*0.7);
+        g.fillStyle(0xe0f2fe, 1);
         g.fillCircle(TILE_SIZE*1.5, TILE_SIZE*1.5, TILE_SIZE*0.3);
         g.generateTexture('tex_CORE', TILE_SIZE*3, TILE_SIZE*3);
         g.clear();
         
         // --- WALL ---
-        // Armored block
-        g.fillStyle(0x333333, 1);
+        g.fillStyle(0x1e293b, 1);
         g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
-        g.lineStyle(2, 0x555555, 1);
-        g.strokeRect(2, 2, TILE_SIZE-4, TILE_SIZE-4);
-        g.fillStyle(0x444444, 1);
-        g.fillRect(8, 8, TILE_SIZE-16, TILE_SIZE-16);
+        g.lineStyle(2, 0x475569, 1);
+        g.strokeRect(1, 1, TILE_SIZE-2, TILE_SIZE-2);
+        g.fillStyle(0x334155, 1);
+        g.fillRect(6, 6, TILE_SIZE-12, TILE_SIZE-12);
+        g.fillStyle(0x64748b, 1);
+        g.fillRect(10, 10, TILE_SIZE-20, TILE_SIZE-20);
         g.generateTexture('tex_WALL', TILE_SIZE, TILE_SIZE);
         g.clear();
         
+        // --- BOMB (Mine) ---
+        g.fillStyle(0x1e293b, 1);
+        g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+        g.fillStyle(0xef4444, 1);
+        g.fillCircle(TILE_SIZE/2, TILE_SIZE/2, TILE_SIZE/3);
+        g.fillStyle(0xfca5a5, 1);
+        g.fillCircle(TILE_SIZE/2, TILE_SIZE/2, 4);
+        g.generateTexture('tex_BOMB', TILE_SIZE, TILE_SIZE);
+        g.clear();
+
         // --- TURRET BASES ---
-        g.fillStyle(0x222222, 1);
-        g.fillCircle(TILE_SIZE, TILE_SIZE, TILE_SIZE - 4);
-        g.lineStyle(2, 0x555555, 1);
-        g.strokeCircle(TILE_SIZE, TILE_SIZE, TILE_SIZE - 4);
+        g.fillStyle(0x0f172a, 1);
+        g.fillRect(0, 0, TILE_SIZE*2, TILE_SIZE*2);
+        g.fillStyle(0x1e293b, 1);
+        g.fillCircle(TILE_SIZE, TILE_SIZE, TILE_SIZE - 2);
+        g.lineStyle(4, 0x475569, 1);
+        g.strokeCircle(TILE_SIZE, TILE_SIZE, TILE_SIZE - 2);
         g.generateTexture('tex_BASE_2x2', TILE_SIZE*2, TILE_SIZE*2);
         g.clear();
         
         // --- CANNON GUN ---
-        g.fillStyle(0x777777, 1);
-        g.fillCircle(TILE_SIZE, TILE_SIZE, TILE_SIZE*0.5);
-        g.fillStyle(0x555555, 1);
-        g.fillRect(TILE_SIZE, TILE_SIZE - 6, TILE_SIZE*0.9, 12); // Barrel pointing right
+        g.fillStyle(0x94a3b8, 1);
+        g.fillCircle(TILE_SIZE, TILE_SIZE, TILE_SIZE*0.6);
+        g.fillStyle(0x64748b, 1);
+        g.fillRect(TILE_SIZE, TILE_SIZE - 8, TILE_SIZE, 16); 
+        g.fillStyle(0x0f172a, 1);
+        g.fillRect(TILE_SIZE*2 - 4, TILE_SIZE - 6, 4, 12);
         g.generateTexture('tex_CANNON_GUN', TILE_SIZE*2, TILE_SIZE*2);
         g.clear();
         
         // --- RAPID GUN ---
-        g.fillStyle(0x887722, 1);
-        g.fillCircle(TILE_SIZE, TILE_SIZE, TILE_SIZE*0.4);
-        g.fillStyle(0xaa9933, 1);
-        g.fillRect(TILE_SIZE, TILE_SIZE - 10, TILE_SIZE*0.7, 6);
-        g.fillRect(TILE_SIZE, TILE_SIZE + 4, TILE_SIZE*0.7, 6);
+        g.fillStyle(0xd97706, 1);
+        g.fillCircle(TILE_SIZE, TILE_SIZE, TILE_SIZE*0.5);
+        g.fillStyle(0xf59e0b, 1);
+        g.fillRect(TILE_SIZE, TILE_SIZE - 12, TILE_SIZE*0.8, 6);
+        g.fillRect(TILE_SIZE, TILE_SIZE + 6, TILE_SIZE*0.8, 6);
         g.generateTexture('tex_RAPID_GUN', TILE_SIZE*2, TILE_SIZE*2);
         g.clear();
         
         // --- SNIPER GUN ---
-        g.fillStyle(0x333388, 1);
-        g.fillRect(TILE_SIZE - 8, TILE_SIZE - 8, 16, 16);
-        g.fillStyle(0x4444aa, 1);
-        g.fillRect(TILE_SIZE, TILE_SIZE - 3, TILE_SIZE*1.2, 6);
+        g.fillStyle(0x4f46e5, 1);
+        g.fillRect(TILE_SIZE - 10, TILE_SIZE - 10, 20, 20);
+        g.fillStyle(0x6366f1, 1);
+        g.fillRect(TILE_SIZE, TILE_SIZE - 3, TILE_SIZE*1.4, 6);
         g.generateTexture('tex_SNIPER_GUN', TILE_SIZE*2, TILE_SIZE*2);
         g.clear();
         
         // --- RAIDER (Speeder) ---
-        g.fillStyle(0xcc2222, 1);
+        g.fillStyle(0xdc2626, 1);
         g.beginPath();
         g.moveTo(TILE_SIZE, TILE_SIZE/2);
-        g.lineTo(0, TILE_SIZE);
-        g.lineTo(0, 0);
+        g.lineTo(0, TILE_SIZE - 4);
+        g.lineTo(4, TILE_SIZE/2);
+        g.lineTo(0, 4);
         g.closePath();
         g.fillPath();
-        g.fillStyle(0xffaa00, 1);
-        g.fillRect(2, TILE_SIZE/2 - 4, 8, 8); // cockpit
+        g.fillStyle(0xfef08a, 1);
+        g.fillCircle(TILE_SIZE/2 + 4, TILE_SIZE/2, 4);
         g.generateTexture('tex_RAIDER', TILE_SIZE, TILE_SIZE);
         g.clear();
         
         // --- TANK ---
-        g.fillStyle(0x555555, 1); // Tracks
-        g.fillRect(0, 0, TILE_SIZE*1.5, 8);
-        g.fillRect(0, TILE_SIZE*1.5 - 8, TILE_SIZE*1.5, 8);
-        g.fillStyle(0x882222, 1); // Body
-        g.fillRect(4, 8, TILE_SIZE*1.5 - 8, TILE_SIZE*1.5 - 16);
-        g.fillStyle(0x333333, 1); // Gun
-        g.fillRect(TILE_SIZE*1.5/2, TILE_SIZE*1.5/2 - 4, TILE_SIZE*0.8, 8);
-        g.fillStyle(0x551111, 1);
-        g.fillCircle(TILE_SIZE*1.5/2, TILE_SIZE*1.5/2, 12);
+        g.fillStyle(0x334155, 1); 
+        g.fillRect(2, 2, TILE_SIZE*1.5 - 4, TILE_SIZE*1.5 - 4);
+        g.fillStyle(0xb91c1c, 1); 
+        g.fillRect(8, 8, TILE_SIZE*1.5 - 16, TILE_SIZE*1.5 - 16);
+        g.fillStyle(0x0f172a, 1); 
+        g.fillRect(TILE_SIZE*1.5/2, TILE_SIZE*1.5/2 - 6, TILE_SIZE*0.8, 12);
+        g.fillStyle(0x7f1d1d, 1);
+        g.fillCircle(TILE_SIZE*1.5/2, TILE_SIZE*1.5/2, 14);
         g.generateTexture('tex_TANK', TILE_SIZE*1.5, TILE_SIZE*1.5);
         g.clear();
         
         // --- SWARM (Bug) ---
-        g.fillStyle(0xaa00aa, 1);
+        g.fillStyle(0x7e22ce, 1);
         g.fillCircle(TILE_SIZE/2, TILE_SIZE/2, TILE_SIZE/3);
-        g.fillStyle(0xff00ff, 1);
-        g.fillCircle(TILE_SIZE/2 + 4, TILE_SIZE/2 - 4, 3);
-        g.fillCircle(TILE_SIZE/2 + 4, TILE_SIZE/2 + 4, 3);
+        g.fillStyle(0xd8b4fe, 1);
+        g.fillCircle(TILE_SIZE/2 + 4, TILE_SIZE/2 - 5, 4);
+        g.fillCircle(TILE_SIZE/2 + 4, TILE_SIZE/2 + 5, 4);
         g.generateTexture('tex_SWARM', TILE_SIZE, TILE_SIZE);
         g.clear();
 
+        // --- BOSS (Titan) ---
+        g.fillStyle(0x1e1b4b, 1);
+        g.fillCircle(TILE_SIZE*1.5, TILE_SIZE*1.5, TILE_SIZE*1.4);
+        g.lineStyle(6, 0x4338ca, 1);
+        g.strokeCircle(TILE_SIZE*1.5, TILE_SIZE*1.5, TILE_SIZE*1.4);
+        g.fillStyle(0x312e81, 1);
+        g.fillCircle(TILE_SIZE*1.5, TILE_SIZE*1.5, TILE_SIZE*0.8);
+        g.fillStyle(0xf43f5e, 1);
+        g.fillCircle(TILE_SIZE*1.5, TILE_SIZE*1.5, TILE_SIZE*0.4);
+        g.fillStyle(0x4338ca, 1);
+        g.fillRect(TILE_SIZE*1.5, TILE_SIZE*1.5 - 10, TILE_SIZE*1.5, 20); // Massive gun
+        g.generateTexture('tex_BOSS', TILE_SIZE*3, TILE_SIZE*3);
+        g.clear();
+
         // Projectile
-        g.fillStyle(0xffff00, 1);
-        g.fillRect(0, 0, 12, 4);
-        g.generateTexture('tex_bullet', 12, 4);
+        g.fillStyle(0xfde047, 1);
+        g.fillRect(0, 0, 16, 6);
+        g.generateTexture('tex_bullet', 16, 6);
         g.clear();
         
         // Hit effect
         g.fillStyle(0xffffff, 1);
-        g.fillCircle(4, 4, 4);
-        g.generateTexture('tex_spark', 8, 8);
+        g.fillCircle(6, 6, 6);
+        g.generateTexture('tex_spark', 12, 12);
         g.clear();
     }
-
     create() {
         this.buildingsGroup = this.add.group();
         this.enemiesGroup = this.add.group();
@@ -260,8 +289,8 @@ export class GameScene extends Phaser.Scene {
         
         let b: any;
         
-        if (type === 'WALL') {
-            b = this.add.sprite(gx * TILE_SIZE, gy * TILE_SIZE, 'tex_WALL').setOrigin(0, 0);
+        if (type === 'WALL' || type === 'BOMB') {
+            b = this.add.sprite(gx * TILE_SIZE, gy * TILE_SIZE, 'tex_' + type).setOrigin(0, 0);
         } else {
             // It's a turret. Create a base and a gun
             b = this.add.container(gx * TILE_SIZE, gy * TILE_SIZE);
@@ -310,7 +339,8 @@ export class GameScene extends Phaser.Scene {
         this.enemiesToSpawn = 5 + this.currentWave * 3;
         this.nextSpawnTime = this.time.now + 1000;
         
-        if (this.currentWave % 5 === 0) this.currentWaveType = 'TANK';
+        if (this.currentWave % 5 === 0) this.currentWaveType = 'BOSS';
+        else if (this.currentWave % 3 === 0) this.currentWaveType = 'TANK';
         else if (this.currentWave % 3 === 0) this.currentWaveType = 'SWARM';
         else this.currentWaveType = 'RAIDER';
     }
@@ -383,7 +413,7 @@ export class GameScene extends Phaser.Scene {
             e.hpBar.fillStyle(p > 0.5 ? 0x00ff00 : 0xff0000, 1);
             e.hpBar.fillRect(e.x - 10, e.y - 20, 20 * p, 4);
 
-            if (!e.targetBuilding || !e.targetBuilding.active || Math.random() < 0.01) {
+            if (!e.targetBuilding || !e.targetBuilding.active || Math.random() < 0.02) {
                 let closest: any = null;
                 let minDist = Infinity;
                 this.buildingsGroup.getChildren().forEach((b: any) => {
@@ -405,31 +435,63 @@ export class GameScene extends Phaser.Scene {
             if (e.targetBuilding) {
                 const gridEx = Phaser.Math.Clamp(Math.floor(e.x / TILE_SIZE), 0, GRID_WIDTH - 1);
                 const gridEy = Phaser.Math.Clamp(Math.floor(e.y / TILE_SIZE), 0, GRID_HEIGHT - 1);
-                const gridBx = Phaser.Math.Clamp(Math.floor(e.targetBuilding.x / TILE_SIZE), 0, GRID_WIDTH - 1);
-                const gridBy = Phaser.Math.Clamp(Math.floor(e.targetBuilding.y / TILE_SIZE), 0, GRID_HEIGHT - 1);
                 
-                if (!e.pathRequested && !e.path) {
+                // Find closest walkable tile around the target building
+                let bestBx = -1;
+                let bestBy = -1;
+                let bestDist = Infinity;
+                
+                const targetBx = Math.floor(e.targetBuilding.x / TILE_SIZE);
+                const targetBy = Math.floor(e.targetBuilding.y / TILE_SIZE);
+                const s = e.targetBuilding.bSize;
+                
+                // Check all tiles around the building perimeter
+                for (let x = targetBx - 1; x <= targetBx + s; x++) {
+                    for (let y = targetBy - 1; y <= targetBy + s; y++) {
+                        if (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {
+                            // Only consider perimeter tiles (not inside the building)
+                            if (x < targetBx || x >= targetBx + s || y < targetBy || y >= targetBy + s) {
+                                if (this.gridMap[y][x] === 0) {
+                                    const dist = Phaser.Math.Distance.Between(gridEx, gridEy, x, y);
+                                    if (dist < bestDist) {
+                                        bestDist = dist;
+                                        bestBx = x;
+                                        bestBy = y;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (bestBx === -1) {
+                    // No walkable tile around target (completely walled off). Attack the closest wall!
+                    let closestWall: any = null;
+                    let minWallDist = Infinity;
+                    this.buildingsGroup.getChildren().forEach((b: any) => {
+                        if (b.bType === 'WALL') {
+                            const d = Phaser.Math.Distance.Between(e.x, e.y, b.x + (b.bSize*TILE_SIZE)/2, b.y + (b.bSize*TILE_SIZE)/2);
+                            if (d < minWallDist) {
+                                minWallDist = d;
+                                closestWall = b;
+                            }
+                        }
+                    });
+                    if (closestWall && e.targetBuilding.bType !== 'WALL') {
+                        e.targetBuilding = closestWall;
+                        e.path = null;
+                        return; // Re-evaluate next frame
+                    }
+                }
+                
+                if (!e.pathRequested && !e.path && bestBx !== -1) {
                     e.pathRequested = true;
-                    this.easystar.findPath(gridEx, gridEy, gridBx, gridBy, (path) => {
+                    this.easystar.findPath(gridEx, gridEy, bestBx, bestBy, (path) => {
                         e.pathRequested = false;
                         if (path && path.length > 0) {
                             e.path = path;
                             e.pathIndex = 1;
                         } else {
-                            let closestWall: any = null;
-                            let minWallDist = Infinity;
-                            this.buildingsGroup.getChildren().forEach((b: any) => {
-                                if (b.bType === 'WALL') {
-                                    const d = Phaser.Math.Distance.Between(e.x, e.y, b.x + (b.bSize*TILE_SIZE)/2, b.y + (b.bSize*TILE_SIZE)/2);
-                                    if (d < minWallDist) {
-                                        minWallDist = d;
-                                        closestWall = b;
-                                    }
-                                }
-                            });
-                            if (closestWall && e.targetBuilding.bType !== 'WALL') {
-                                e.targetBuilding = closestWall;
-                            }
                             e.path = [];
                         }
                     });
@@ -449,10 +511,11 @@ export class GameScene extends Phaser.Scene {
                         e.rotation = angle;
                     }
                 } else if (e.path !== null) {
+                    // Direct approach or reached target
                     const tx = e.targetBuilding.x + (e.targetBuilding.bSize*TILE_SIZE)/2;
                     const ty = e.targetBuilding.y + (e.targetBuilding.bSize*TILE_SIZE)/2;
                     const dist = Phaser.Math.Distance.Between(e.x, e.y, tx, ty);
-                    const reachDist = (e.targetBuilding.bSize * TILE_SIZE) / 2 + 15;
+                    const reachDist = (e.targetBuilding.bSize * TILE_SIZE) / 2 + 25; // increased reach distance slightly
                     
                     if (dist < reachDist) {
                         e.body.setVelocity(0, 0);
@@ -486,7 +549,6 @@ export class GameScene extends Phaser.Scene {
             }
         });
     }
-
     spawnExplosion(x: number, y: number, color: number) {
         const emitter = this.add.particles(x, y, 'tex_spark', {
             speed: { min: 50, max: 150 },
@@ -517,12 +579,42 @@ export class GameScene extends Phaser.Scene {
             if (b.bType === 'CORE' || b.bType === 'WALL') return;
             
             const bInfo = BUILDING_TYPES[b.bType as keyof typeof BUILDING_TYPES] as any;
+            if (!bInfo) return;
             if (!bInfo.range) return;
-            
+
             const bx = b.x + (b.bSize*TILE_SIZE)/2;
             const by = b.y + (b.bSize*TILE_SIZE)/2;
             
-            // Find target
+            if (b.bType === 'BOMB') {
+                let triggered = false;
+                this.enemiesGroup.getChildren().forEach((e: any) => {
+                    const dist = Phaser.Math.Distance.Between(bx, by, e.x, e.y);
+                    if (dist < bInfo.range) {
+                        triggered = true;
+                    }
+                });
+                
+                if (triggered) {
+                    this.spawnExplosion(bx, by, 0xff0000); 
+                    this.enemiesGroup.getChildren().forEach((e: any) => {
+                        const dist = Phaser.Math.Distance.Between(bx, by, e.x, e.y);
+                        if (dist < bInfo.range) {
+                            e.hp -= bInfo.damage;
+                            if (e.hp <= 0) {
+                                this.spawnExplosion(e.x, e.y, 0xffaa00);
+                                useGameStore.getState().setGold(useGameStore.getState().gold + e.reward);
+                                e.hpBar.destroy();
+                                e.destroy();
+                            }
+                        }
+                    });
+                    b.hp = 0;
+                    this.destroyBuilding(b);
+                }
+                return;
+            }
+
+            // Turret logic
             let closest: any = null;
             let minDist = bInfo.range;
             
@@ -535,10 +627,8 @@ export class GameScene extends Phaser.Scene {
             });
             
             if (closest) {
-                // Rotate gun towards target
                 const angle = Phaser.Math.Angle.Between(bx, by, closest.x, closest.y);
                 if (b.gunSprite) {
-                    // Smooth rotation could be added, but instant is fine for now
                     b.gunSprite.rotation = angle;
                 }
                 

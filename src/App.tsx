@@ -47,6 +47,7 @@ function App() {
                 {gameState === 'PREPARATION' && (
                     <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '10px', pointerEvents: 'auto' }}>
                         <button onClick={() => handleBuild('WALL')} style={{ padding: '10px', background: selectedBuilding === 'WALL' ? '#66f' : '#444', color: '#fff', border: '1px solid #fff' }}>Wall (10G)</button>
+                        <button onClick={() => handleBuild('BOMB')} style={{ padding: '10px', background: selectedBuilding === 'BOMB' ? '#66f' : '#444', color: '#fff', border: '1px solid #fff' }}>Mine (50G)</button>
                         <button onClick={() => handleBuild('CANNON')} style={{ padding: '10px', background: selectedBuilding === 'CANNON' ? '#66f' : '#444', color: '#fff', border: '1px solid #fff' }}>Cannon (100G)</button>
                         <button onClick={() => handleBuild('RAPID')} style={{ padding: '10px', background: selectedBuilding === 'RAPID' ? '#66f' : '#444', color: '#fff', border: '1px solid #fff' }}>Rapid (150G)</button>
                         <button onClick={() => handleBuild('SNIPER')} style={{ padding: '10px', background: selectedBuilding === 'SNIPER' ? '#66f' : '#444', color: '#fff', border: '1px solid #fff' }}>Sniper (200G)</button>

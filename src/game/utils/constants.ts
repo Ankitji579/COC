@@ -6,6 +6,7 @@ export const GRID_HEIGHT = 20;
 export const BUILDING_TYPES = {
     CORE: { name: 'Command Core', size: 3, hp: 1000, cost: 0 },
     WALL: { name: 'Wall', size: 1, hp: 200, cost: 10 },
+    BOMB: { name: 'Mine Trap', size: 1, hp: 10, cost: 50, range: 60, damage: 200, trap: true },
     CANNON: { name: 'Cannon', size: 2, hp: 300, cost: 100, range: 120, damage: 20, fireRate: 1000 },
     RAPID: { name: 'Rapid Turret', size: 2, hp: 250, cost: 150, range: 100, damage: 5, fireRate: 200 },
     SNIPER: { name: 'Sniper Tower', size: 2, hp: 200, cost: 200, range: 300, damage: 50, fireRate: 2000 },
@@ -14,5 +15,6 @@ export const BUILDING_TYPES = {
 export const ENEMY_TYPES = {
     RAIDER: { name: 'Raider', speed: 60, hp: 50, damage: 10, reward: 5 },
     TANK: { name: 'Tank', speed: 30, hp: 300, damage: 30, reward: 20 },
-    SWARM: { name: 'Swarm', speed: 90, hp: 20, damage: 5, reward: 2 }
+    SWARM: { name: 'Swarm', speed: 90, hp: 20, damage: 5, reward: 2 },
+    BOSS: { name: 'Titan Mech', speed: 20, hp: 3000, damage: 50, reward: 500 }
 };
